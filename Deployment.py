@@ -8,6 +8,13 @@ from streamlit_option_menu import option_menu
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
+'''
+To run deployment, open enviroment terminal then:
+1. cd to project folder partition. ex: cd d:
+2. cd to project folder. ex: cd "\Sentiment-Analysis-of-movie-reviews"
+3. run this command: streamlit run deployment.py
+'''
+
 ######################## Functions & Definitions ########################
 
 def classify_text_features(vectorizer, text_data, model):
