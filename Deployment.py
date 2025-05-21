@@ -142,31 +142,36 @@ elif choose == 'Predictions':
     st.markdown("<h3 style='text-align: center;'>🔮 Sentiment Analysis of Movie Reviews Predictions:</h3>", unsafe_allow_html=True)
     st.write('---')
 
+    models_list = list(models.keys())
+    # Track previous selection
+    if 'prev_model_index' not in st.session_state:
+        st.session_state.prev_model_index = 0
+    if 'Show_matrix_and_accuracy' not in st.session_state:
+        st.session_state.Show_matrix_and_accuracy = False
+
     # Select model using dropdown menu
-    selected_model = st.selectbox("Select Model", list(models.keys()), key = 'model_selection')
-    
-    # Open the file in read mode
-    file_path = accuracies[selected_model]  
-    with open(file_path, "r") as file:
-        file_contents = file.read()
-        session_state = st.session_state
-        
-    if 'Show_matrix_and_accuracy' not in session_state:
-        session_state.Show_matrix_and_accuracy = False
-    
-    # Toggles button so that when it's pressed, it stays pressed and doesn't refresh.
+    selected_model = st.selectbox("Select Model", models_list, key='model_selection')
+    current_index = models_list.index(selected_model)
+
+    # If selection changed, reset display flag
+    if st.session_state.prev_model_index != current_index:
+        st.session_state.Show_matrix_and_accuracy = False
+    st.session_state.prev_model_index = current_index
+
+    # Button to show matrix and accuracy
     if st.button('Show matrix and accuracy'):
-        session_state.Show_matrix_and_accuracy = True
-        
-    if session_state.Show_matrix_and_accuracy:
-        # Display accuracy and confussion matrix using the selected model
+        st.session_state.Show_matrix_and_accuracy = True
+
+    if st.session_state.Show_matrix_and_accuracy:
+        file_path = accuracies[selected_model]
+        with open(file_path, "r") as file:
+            file_contents = file.read()
         st.write("##### This is the accuracy of the", selected_model , " : ", file_contents, '%')
         st.write(" ")
         st.image(confusionMatrices[selected_model])
     st.write('---')
 
     text_input = st.text_area("Enter text for analysis:", height = 150)
-
     if st.button('Classify'):
         if text_input:
             processed_text = preprocess_text(text_input)
