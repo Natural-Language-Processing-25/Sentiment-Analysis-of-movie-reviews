@@ -8,12 +8,12 @@ from streamlit_option_menu import option_menu
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
-'''
-To run deployment, open enviroment terminal then:
-1. cd to project folder partition. ex: cd d:
-2. cd to project folder. ex: cd "\Sentiment-Analysis-of-movie-reviews"
-3. run this command: streamlit run deployment.py
-'''
+#Set page configuration
+st.set_page_config(
+    page_title = 'Sentiment Analysis of Movie Reviews',
+    page_icon = '::magnifier::',
+    initial_sidebar_state = 'expanded',
+)
 
 ######################## Functions & Definitions ########################
 
@@ -54,18 +54,6 @@ models = {
     "SVM: RBF": SVM_rbf_model,
 }
 
-# Confusion matrices dictionary
-confusionMatrices = {
-    "Decision Tree": r"",
-    "Logistic Regression: L1": r"",
-    "Logistic Regression: L2": r"",
-    "Naive Bayes": r"",
-    "Random Forest": r"",
-    "SVM: Linear": r"",
-    "SVM: Poly": r"",
-    "SVM: RBF": r"",
-}
-
 # Accuracies
 accuracies = {
     "Decision Tree": r"Accuracies\DT.txt",
@@ -82,18 +70,12 @@ column = ['text']
 
 ######################## Main Display ########################
 
-#Set page configuration
-st.set_page_config(
-    page_title = 'Sentiment Analysis of Movie Reviews',
-    page_icon = '::magnifier::',
-    initial_sidebar_state = 'expanded',
-)
 
 # Center align the header
 st.markdown("<h1 style='text-align: center;'>Sentiment Analysis of Movie Reviews System</h1>", unsafe_allow_html=True)
 
 # Display animation at the top
-gif_path = r"Visualization\GIF.gif"
+gif_path = r"Visualization\\GIF.gif"
 
 # Create three columns and put the image in the center one
 col1, col2, col3 = st.columns([1, 2, 1])
@@ -102,8 +84,8 @@ with col2:
 
 # Sidebar Design
 with st.sidebar:
-    choose = option_menu(None, ["About", "Predictions", "Graphs"],
-                        icons = [ 'house','kanban', 'book'],
+    choose = option_menu(None, ["About", "Predictions"],
+                        icons = [ 'house','kanban'],
                         menu_icon = "app-indicator", default_index = 0,
                         styles ={ 
         "container": {"padding": "5!important", "background-color": "#fafafa"},
@@ -118,7 +100,7 @@ if choose == 'About':
     
     st.markdown("<h3 style='text-align: center;'>Sentiment Analysis of Movie Reviews System About:</h3>", unsafe_allow_html=True)
     st.write('---')
-    st.write("##### ")
+    st.write("##### This system is a sentiment analysis pipeline designed to classify text reviews as positive or negative. It processes a dataset of movie reviews stored in text files, applies preprocessing, augmentation, and feature extraction, and visualizes the results using dimensionality reduction techniques. The system is implemented in Python using a Jupyter Notebook (Main.ipynb) and leverages libraries such as spaCy, NLTK, scikit-learn, and Matplotlib.")
     
 # Predictions Page
 elif choose == 'Predictions':
@@ -134,20 +116,17 @@ elif choose == 'Predictions':
         file_contents = file.read()
         session_state = st.session_state
         
-    if 'Show_matrix_and_accuracy' not in session_state:
-        session_state.Show_matrix_and_accuracy = False
+    if 'Show_accuracy' not in session_state:
+        session_state.Show_accuracy = False
     
     # Toggles button so that when it's pressed, it stays pressed and doesn't refresh.
-    if st.button('Show matrix and accuracy'):
-        session_state.Show_matrix_and_accuracy = True
+    if st.button('Show accuracy'):
+        session_state.Show_accuracy = True
         
-    if session_state.Show_matrix_and_accuracy:
-        # Display accuracy and confussion matrix using the selected model
+    if session_state.Show_accuracy:
+        # Display accuracy using the selected model
         st.write("##### This is the accuracy of the", selected_model , " : ", file_contents, '%')
         st.write(" ")
-        st.write("##### This is the confussion matrix for the ", selected_model ,  " :")
-        st.write(" ")
-        st.image(confusionMatrices[selected_model])
     st.write('---')
 
     text_input = st.text_area("Enter text for analysis:", height = 150)
@@ -156,19 +135,12 @@ elif choose == 'Predictions':
         if text_input:
             classification = classify_text_features(vectorizer, [text_input], models[selected_model])
             st.write(f"### Predicted Result ({selected_model}):")
-            if classification[0] == 1:  # Assuming 1 represents positive
+            if classification[0] == 1: 
                 st.markdown("<h2 style='color: green;'>Positive Review 👍🏼</h2>", unsafe_allow_html=True)
                 st.balloons()
-            elif classification[0] == 0:  # Assuming 0 represents negative
+            elif classification[0] == 0:
                 st.markdown("<h2 style='color: red;'>Negative Review 👎🏼</h2>", unsafe_allow_html=True)
             else:
                 st.write("Neutral or Undetermined")
         else:
             st.warning("Please enter some text to analyze.")
-                
-elif choose == 'Graphs':
-    st.markdown("<h3 style='text-align: center;'>Sentiment Analysis of Movie Reviews System Graphs :</h3>", unsafe_allow_html=True)
-    st.write('---')
-    
-    # st.write("### ")
-    # st.image("")
